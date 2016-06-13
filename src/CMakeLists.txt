@@ -5,4 +5,4 @@ link_directories(python2.7)
 ADD_EXECUTABLE( eyeLike main.cpp findEyeCenter.cpp findEyeCenter.h findEyeCorner.cpp findEyeCorner.h constants.h helpers.cpp helpers.h)
 TARGET_LINK_LIBRARIES( eyeLike ${OpenCV_LIBS})
  
-TARGET_LINK_LIBRARIES( eyeLike python2.7)
+TARGET_LINK_LIBRARIES( eyeLike /usr/lib/libpython2.7.dylib)

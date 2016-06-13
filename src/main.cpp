@@ -76,14 +76,15 @@ cv::Mat skinCrCbHist = cv::Mat::zeros(cv::Size(256, 256), CV_8UC1);
 
 int main( int argc, const char** argv ) {
 
-  /*
+  
   Py_Initialize();
   pModule= PyImport_Import(PyString_FromString("test_powei2"));
   pFunc=PyObject_GetAttrString(pModule,"fun");
   pArgs=PyTuple_New(1);
-  PyTuple_SetItem(pArgs,0,PyInt_FromLong(5));
+  // DON'T MOVE AT FIRST TIME
+  PyTuple_SetItem(pArgs,0,PyInt_FromLong(6));
   pValue=PyObject_CallObject(pFunc,pArgs);
-  */
+  
 
   cv::Mat frame;
 
@@ -265,10 +266,11 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
   instruction = ValuesToDirection(x_o,y_o,rightPupil.x,rightPupil.y);   
   
 
-  /*
-  PyTuple_SetItem(pArgs,0,PyInt_FromLong(instruction));
-  pValue=PyObject_CallObject(pFunc,pArgs);
-  */
+  if (time_counter > 9) {
+    PyTuple_SetItem(pArgs,0,PyInt_FromLong(instruction));
+    pValue=PyObject_CallObject(pFunc,pArgs);
+  }
+  
 
 
   //-- Find Eye Corners

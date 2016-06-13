@@ -1,3 +1,0 @@
-/Users/ShangYu/Desktop/github/belab-final/build/CMakeFiles/ZERO_CHECK.dir
-/Users/ShangYu/Desktop/github/belab-final/build/CMakeFiles/ALL_BUILD.dir
-/Users/ShangYu/Desktop/github/belab-final/build/src/CMakeFiles/eyeLike.dir
