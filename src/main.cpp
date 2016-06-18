@@ -9,43 +9,82 @@
 #include "findEyeCenter.h"
 #include "findEyeCorner.h"
 #include <math.h>
+#include <unistd.h>
 
 /* global variables for sending signal*/
 int time_counter=0;
 int x_center,y_center;
-int ValuesToDirection(int x_o, int y_o, int x_e, int y_e){	      
+int movement;
+int Boxx;
+int Boxy;
+#define boundary 320
+
+int ValuesToDirection(int x_o, int y_o, int x_e, int y_e){        
         int temp_x = x_e-x_o;
         int temp_y = y_e-y_o;
         std::cout << "x_o: " << x_o << " y_o: " << y_o << std::endl;
         std::cout << "x_e: " << x_e << " y_e: " << y_e << std::endl; 
+        // std::cout<<Boxx<<'\n'<<Boxy<<'n';
         int amplitude = temp_x*temp_x + temp_y*temp_y;
         int angle = atan2(temp_y, temp_x) * 180 / 3.1415926;
-        
+     
         if(angle < 0) {
           angle = angle + 360;
         }
  
         std::cout<<"amplitude : "<<amplitude<<" ; angle : "
           << angle << std::endl;
-        
-	      // during calibration, do not move the car
+        // during calibration, do not move the car
         if (time_counter < 9){
           return 0;
         }
- 
-        if((0<angle && angle<=60)||(angle > 345)) {
-          std::cout << "TURN RIGHT!" << std::endl << std::endl;
-          return 3; // right
+        //150
+        //130
+        //13 7
+        if(abs(temp_x)<Boxx/10 && abs(temp_y)<Boxy/15 ) 
+        {
+          /*
+          std::cout<<"Zone!"<<"\n";
+          if(movement==3)
+            std::cout<<"TURN RIGHT!"<<std::endl;
+          else if(movement==4)
+            std::cout<<"MOVE FORWARD!"<<std::endl;
+          else if(movement==5)
+            std::cout<<"TURN LEFT!"<<std::endl;
+          else
+            std::cout<<"IDLE"<<std::endl;
+          return movement;
+          */
+          std::cout<<"---------------------\n";
+          std::cout<<"   IN STEADY ZONE!  \n";
+          std::cout<<"---------------------\n";
+          std::cout << "BoxX: " << Boxx/10 << "  BoxY: " << Boxy/12 << std::endl; 
+          return 0;
         }
-        else if(angle < 320 && angle>=235) {
-          std::cout << "MOVE FORWARD!" << std::endl << std::endl;
-          return 4; // forward
+        else
+        {
+          if((0<angle && angle<=60)||(angle > 345)) {
+            std::cout << "TURN RIGHT!" << std::endl << std::endl;
+            // movement=3;
+            return 3; // right
+          }
+          else if(angle < 320 && angle>=235) {
+            std::cout << "MOVE FORWARD!" << std::endl << std::endl;
+            // movement=4;
+            return 4; // forward
+          }
+          else if(90<angle && angle<=225) {
+            std::cout << "TURN LEFT!" << std::endl << std::endl;
+            // movement=5;
+            return 5; // left
+          }
+          else 
+          {
+              std::cout << "DON'T MOVE!" << std::endl << std::endl;
+              // movement=0;
+              return 0;
+          }       
         }
-        else if(90<angle && angle<=225) {
-          std::cout << "TURN LEFT!" << std::endl << std::endl;
-          return 5; // left
-        }
-        else return 0;
 }
 
 
@@ -54,7 +93,6 @@ int ValuesToDirection(int x_o, int y_o, int x_e, int y_e){
 
 PyObject *pModule, *pFunc;
 PyObject *pArgs, *pValue;
-
 
 /** Function Headers */
 void detectAndDisplay( cv::Mat frame );
@@ -75,15 +113,14 @@ cv::Mat skinCrCbHist = cv::Mat::zeros(cv::Size(256, 256), CV_8UC1);
 #include <Python.h>
 
 int main( int argc, const char** argv ) {
-
   
-  Py_Initialize();
-  pModule= PyImport_Import(PyString_FromString("test_powei2"));
-  pFunc=PyObject_GetAttrString(pModule,"fun");
-  pArgs=PyTuple_New(1);
-  // DON'T MOVE AT FIRST TIME
-  PyTuple_SetItem(pArgs,0,PyInt_FromLong(6));
-  pValue=PyObject_CallObject(pFunc,pArgs);
+Py_Initialize();
+pModule= PyImport_Import(PyString_FromString("test_powei2"));
+pFunc=PyObject_GetAttrString(pModule,"fun");
+pArgs=PyTuple_New(1);
+// DON'T MOVE AT FIRST TIME
+PyTuple_SetItem(pArgs,0,PyInt_FromLong(6));
+pValue=PyObject_CallObject(pFunc,pArgs);
   
 
   cv::Mat frame;
@@ -161,7 +198,7 @@ int main( int argc, const char** argv ) {
   }
 
   releaseCornerKernels();
-  Py_Finalize();
+  //Py_Finalize();
 
   return 0;
 }
@@ -207,6 +244,8 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
   rightRightCornerRegion.height /= 2;
   rightRightCornerRegion.y += rightRightCornerRegion.height / 2;
   rectangle(debugFace,leftRightCornerRegion,200);
+  Boxx=leftRightCornerRegion.width+leftLeftCornerRegion.width;
+  Boxy=leftRightCornerRegion.height+leftLeftCornerRegion.height;
   rectangle(debugFace,leftLeftCornerRegion,200);
   rectangle(debugFace,rightLeftCornerRegion,200);
   rectangle(debugFace,rightRightCornerRegion,200);
@@ -267,8 +306,8 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
   
 
   if (time_counter > 9) {
-    PyTuple_SetItem(pArgs,0,PyInt_FromLong(instruction));
-    pValue=PyObject_CallObject(pFunc,pArgs);
+   PyTuple_SetItem(pArgs,0,PyInt_FromLong(instruction));
+   pValue=PyObject_CallObject(pFunc,pArgs);
   }
   
 
